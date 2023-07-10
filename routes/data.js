@@ -3,7 +3,7 @@ const dataModel = require('../model/data');
 
 const router = express.Router();
 
-// Create a new data entry: enables us to save sample data in the DB
+// Create a new data entry: enables us to save sample data in the DB (This is no longer needed as we assume the data is already in)
 router.post('/', async (req, res) => {
   try {
     const data = new dataModel({
