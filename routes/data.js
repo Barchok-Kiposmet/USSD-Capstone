@@ -6,7 +6,9 @@ const router = express.Router();
 // CRUD Operations
 router.post('/', async function (req, res) {
     const data = new dataModel({
-        title: req.body.title,
+        type: req.body.type,
+        resource: req.body.resource,
+        amount: req.body.amount,
         description: req.body.description,
     
     });
