@@ -20,7 +20,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Fetch all data entries or filter by amount. The endpoint will look like this: http://localhost:3000/data?amount=100
+// Fetch all data entries or filter by amount. The endpoint will look like this: http://localhost:3000/data?amount=100 (This will change based on the user input)
 router.get('/', async (req, res) => {
   try {
     const filterByAmount = req.query.amount;
