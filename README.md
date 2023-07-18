@@ -12,7 +12,7 @@ This will simplify the long list of products to only a few to the specific amoun
 A mock Mongo db database has been created with a few products to demonstrate the filter application.
 
 ## Pre-requisites
-Before running add a `.env` file with the following structure and update it appropriately
+Before running add a `.env` file in the root directory with the following structure and update it appropriately
 ```
 DATABASE_URL=MONGO_DB_URL
 SESSION_SECRET=YOUR_SESSION_SECRET
