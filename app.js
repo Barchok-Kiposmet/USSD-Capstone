@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const dataRoutes = require('./routes/data');
+const ussdRoutes = require('./routes/ussd');
 
 const PORT = process.env.PORT || 3000;
 
@@ -33,6 +34,7 @@ app.use(session({
 }))
 
 app.use('/data', dataRoutes); 
+app.use('/', ussdRoutes);
 
 app.listen(PORT, () => {
     console.log(`My server is running on PORT ${PORT}`);
