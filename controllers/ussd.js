@@ -178,6 +178,10 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
 async function processOffers(userInput, session){
     const offers = await fetchOffersInRange(userInput);
     session.offers = offers;
-    return offers;
+    // Map the offers to JSON objects with index+1 as keys and offer names as values
+    return  offers.reduce((result, offer, index) => {
+        result[index + 1] = `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
+        return result;
+    }, {});
 }
 module.exports = { getSession, setSession, processUSSD };
