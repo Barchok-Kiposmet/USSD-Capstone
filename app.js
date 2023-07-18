@@ -1,5 +1,10 @@
 const express = require('express');
 const { mongoose } = require('mongoose');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const MemoryStore = require('memorystore')(session);
+const cookieParser = require('cookie-parser');
+
 require('dotenv').config();
 
 const dataRoutes = require('./routes/data');
@@ -13,7 +18,19 @@ mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTo
 
 
 const app = express();
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+//Setting up the session
+app.use(cookieParser());
+app.use(session({
+    store: new MemoryStore({
+        checkPeriod: 30000 // prune expired entries every 30Sec
+    }),
+    resave: false,
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized:false
+}))
 
 app.use('/data', dataRoutes); 
 
