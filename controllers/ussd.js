@@ -103,4 +103,68 @@ async function validateInput(currentOption, userInput) {
             }
     }
 }
+
+/**
+ *Generated user response based on what the user has provided
+ * @param {string} menuOption
+ * @param {boolean} isInvalid
+ * @param {string} userInput
+ * @param {Object} data
+ * @returns {promise}
+ * **/
+async function generateMenuResponse(menuOption, isInvalid, userInput, data) {
+    // Initialize the response variables
+    let menuText;
+    let menuOptions = {};
+
+    // Generate the appropriate menu based on the current menu option
+    switch (menuOption) {
+        case 'askAmount':
+            menuText = 'CON How much do you wish to spend?';
+            menuOptions = {};
+            break;
+
+        case 'availableOffers':
+            menuText =
+                'CON Available Offers \n';
+            menuOptions = await fetchOffersInRange(userInput);
+            break;
+
+        case 'moreOffers':
+            menuText = 'CON More Offers \n';
+            menuOptions = await getMoreOffers();
+            break;
+
+        case 'confirmSelectOffer':
+            menuText = 'END You are about to subscribed to an offer. Confirm?';
+            menuOptions = { '1': 'Yes', '2': 'No', '0': 'Back' };
+            break;
+
+        case 'save':
+            await saveOffer()
+            menuText = 'END Successful. You have subscribed to an offer. Thank you!';
+            break;
+
+        case 'dont_save':
+            menuText = 'END Offer selection Canceled. Thank you!';
+            break;
+
+        default:
+            menuText = 'END Invalid input. Please try again.';
+            break;
+    }
+
+    // Generate the USSD response
+    let response = isInvalid?"Invalid input, try again\n"+menuText:menuText;
+    const optionKeys = Object.keys(menuOptions);
+    if (optionKeys.length > 0) {
+        response += '\n' + optionKeys.map((key) => `${key}. ${menuOptions[key]}`).join('\n');
+    }
+
+    return Promise.resolve({
+        menuOption: menuOption,
+        response: response
+    });
+}
+
 module.exports = { getSession, setSession, processUSSD };
