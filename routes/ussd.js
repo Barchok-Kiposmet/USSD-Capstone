@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
     if (session) {
         //Process User Input
         const input = session.input ? text.slice(session.input.length).replace('*', '') : text;
-        const response = await processUSSD(input, session.menuOption, session.data);
+        const response = await processUSSD(input, session.menuOption, session);
         session.data[session.menuOption] = input;
         session.previousOption = session.menuOption;
         session.menuOption = response.menuOption;

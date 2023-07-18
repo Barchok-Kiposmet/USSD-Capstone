@@ -41,15 +41,15 @@ function setSession(sessionStore, sessionId, sessionObj) {
  *Processes what the user has provided
  * @param {string} userInput
  * @param {string} menu
- * @param {Object} data
+ * @param {Object} session
  * @returns {Promise}
  * **/
-async function processUSSD(userInput, menu, data) {
+async function processUSSD(userInput, menu, session) {
     try {
         const menuOption = await validateInput(menu, userInput);
         return await generateMenuResponse(
             menuOption === "invalid" ? menu : menuOption,
-            menuOption === "invalid", userInput, data
+            menuOption === "invalid", userInput, session
         );
     } catch (error) {
         return {
@@ -110,10 +110,10 @@ async function validateInput(currentOption, userInput) {
  * @param {string} menuOption
  * @param {boolean} isInvalid
  * @param {string} userInput
- * @param {Object} data
+ * @param {Object} session
  * @returns {promise}
  * **/
-async function generateMenuResponse(menuOption, isInvalid, userInput, data) {
+async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
     // Initialize the response variables
     let menuText;
     let menuOptions = {};
@@ -128,7 +128,7 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, data) {
         case 'availableOffers':
             menuText =
                 'CON Available Offers \n';
-            menuOptions = await fetchOffersInRange(userInput);
+            menuOptions = await processOffers(userInput, session);
             break;
 
         case 'moreOffers':
@@ -168,4 +168,16 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, data) {
     });
 }
 
+/**
+ *Generated user response based on what the user has provided
+ * @param {string} userInput
+ * @param {object} session
+ * @returns {promise}
+ * **/
+
+async function processOffers(userInput, session){
+    const offers = await fetchOffersInRange(userInput);
+    session.offers = offers;
+    return offers;
+}
 module.exports = { getSession, setSession, processUSSD };
