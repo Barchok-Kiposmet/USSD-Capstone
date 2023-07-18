@@ -36,4 +36,27 @@ function setSession(sessionStore, sessionId, sessionObj) {
     })
 }
 
-module.exports = { getSession, setSession };
+/**
+ *Processes what the user has provided
+ * @param {string} userInput
+ * @param {string} menu
+ * @param {Object} data
+ * @returns {Promise}
+ * **/
+async function processUSSD(userInput, menu, data) {
+    try {
+        const menuOption = await validateInput(menu, userInput);
+        return await generateMenuResponse(
+            menuOption === "invalid" ? menu : menuOption,
+            menuOption === "invalid", userInput, data
+        );
+    } catch (error) {
+        return {
+            menuOption: "main",
+            response: "END Error! Please try again",
+            error:error
+        };
+    }
+}
+
+module.exports = { getSession, setSession, processUSSD };

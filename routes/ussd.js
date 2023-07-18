@@ -1,5 +1,5 @@
 const express = require('express');
-const { getSession, setSession } = require('../controllers/ussd');
+const { getSession, setSession, processUSSD } = require('../controllers/ussd');
 const router = express.Router();
 
 
@@ -13,7 +13,23 @@ router.post('/', async (req, res) => {
     const session = await getSession(req.sessionStore, sessionId)
     if (session) {
         //Process User Input
-        res.status(200).send('Session exists')
+        const input = session.input ? text.slice(session.input.length).replace('*', '') : text;
+        const response = await processUSSD(input, session.menuOption, session.data);
+        session.data[session.menuOption] = input;
+        session.previousOption = session.menuOption;
+        session.menuOption = response.menuOption;
+        session.previousinput = session.input;
+        session.input = text;
+
+        await new Promise((resolve, reject) => {
+            req.sessionStore.set(sessionId, session, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+
+        res.status(200).send(response.response);
+        console.log(session)
         return;
     }
 
@@ -21,36 +37,18 @@ router.post('/', async (req, res) => {
     const sessionObj = {
         cookie: {
             maxAge: 60000, httpOnly: true
-        }, id: sessionId
+        }, id: sessionId, input: text, menuOption: "askAmount", data: {
+            phoneNumber: phoneNumber
+        }
     }
 
 
     await setSession(req.sessionStore, sessionId, sessionObj)
-    res.status(200).send('New Session Created')
-    return;
+
+    const response = await processUSSD("", "*", {});
 
 
-    let response = '';
-
-    if (text == '') {
-        // This is the first request. Note how we start the response with CON
-        response = `CON How much do you wish to spend?`;
-    } else if (text == '100') {
-        // This is the first request. Note how we start the response with CON
-        response = `CON 
-        1. Offer 1 @100
-        2. Offer 2 @100
-        3. Offer 3 @100
-        0:Back`;
-
-    } else if (text == '100*2') {
-        // Business logic for first level response
-        // This is a terminal request. Note how we start the response with END
-        response = `END You have bought X Offer for amount X`;
-    }
-    // Send the response back to the API
-    res.set('Content-Type: text/plain');
-    res.send(response);
+    res.status(200).send(response.response);
 });
 
 module.exports = router;
