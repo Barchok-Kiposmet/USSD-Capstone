@@ -144,7 +144,7 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
             break;
 
         case 'save':
-            menuText = 'END Successful. You have subscribed to an offer. Thank you!';
+            menuText = `END Successful. You have subscribed to ${session.selectedOffer.name}. Thank you!`;
             break;
 
         case 'dont_save':
@@ -196,6 +196,10 @@ async function processOffers(userInput, session){
 async function selectedOffer(userInput, session){
     const adjustedIndex = userInput - 1;
     const offer = session.offers[adjustedIndex];
+    session.selectedOffer={
+        id:offer.id,
+        name:`${offer.resource} ${offer.description} @ Ksh ${offer.amount}`
+    };
     return `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
 }
 module.exports = { getSession, setSession, processUSSD };
