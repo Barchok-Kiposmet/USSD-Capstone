@@ -59,4 +59,48 @@ async function processUSSD(userInput, menu, data) {
     }
 }
 
+/**
+ *Validate what the user has provided
+ * @param {string} currentOption
+ * @param {string} userInput
+ * @returns {promise}
+ * **/
+async function validateInput(currentOption, userInput) {
+    switch (currentOption) {
+        case '*':
+            return "askAmount";
+
+        case 'askAmount':
+            const regex = /^\d+$/;
+            if (!regex.test(userInput)) {
+                // Invalid input, ask again
+                return 'invalid';
+            }
+            return "availableOffers";
+
+        case 'availableOffers':
+            switch (userInput) {
+                case '0':
+                    return "return";
+                case '1':
+                    return "confirmSelectOffer";
+                case '98':
+                    return "moreOffers";
+            }
+            return "moreOffers";
+
+        case 'moreOffers':
+            return "confirmSelectOffer";
+
+        case 'confirmSelectOffer':
+            switch (userInput) {
+                case '0':
+                    return "return";
+                case '1':
+                    return "save";
+                case '2':
+                    return "dont_save";
+            }
+    }
+}
 module.exports = { getSession, setSession, processUSSD };
