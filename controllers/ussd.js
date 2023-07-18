@@ -46,7 +46,7 @@ function setSession(sessionStore, sessionId, sessionObj) {
  * **/
 async function processUSSD(userInput, menu, session) {
     try {
-        const menuOption = await validateInput(menu, userInput);
+        const menuOption = await validateInput(menu, userInput, session);
         return await generateMenuResponse(
             menuOption === "invalid" ? menu : menuOption,
             menuOption === "invalid", userInput, session
@@ -64,31 +64,33 @@ async function processUSSD(userInput, menu, session) {
  *Validate what the user has provided
  * @param {string} currentOption
  * @param {string} userInput
+ * @param {object} session
  * @returns {promise}
  * **/
-async function validateInput(currentOption, userInput) {
+async function validateInput(currentOption, userInput, session) {
+    const regex = /^\d+$/;
+    if ( currentOption !== "*" && !regex.test(userInput)) {
+        // Invalid input, ask again
+        return 'invalid';
+    }
     switch (currentOption) {
         case '*':
             return "askAmount";
 
         case 'askAmount':
-            const regex = /^\d+$/;
-            if (!regex.test(userInput)) {
-                // Invalid input, ask again
-                return 'invalid';
-            }
             return "availableOffers";
 
         case 'availableOffers':
             switch (userInput) {
                 case '0':
-                    return "return";
-                case '1':
-                    return "confirmSelectOffer";
+                    return "askAmount";
                 case '98':
                     return "moreOffers";
             }
-            return "moreOffers";
+            if(!(userInput >= 0 && userInput < session.offers.length))
+                return 'invalid'
+
+            return "confirmSelectOffer";
 
         case 'moreOffers':
             return "confirmSelectOffer";
@@ -137,12 +139,11 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
             break;
 
         case 'confirmSelectOffer':
-            menuText = 'END You are about to subscribed to an offer. Confirm?';
+            menuText = `END You are about to subscribed to ${await selectedOffer(userInput, session)}. Confirm?`;
             menuOptions = { '1': 'Yes', '2': 'No', '0': 'Back' };
             break;
 
         case 'save':
-            await saveOffer()
             menuText = 'END Successful. You have subscribed to an offer. Thank you!';
             break;
 
@@ -183,5 +184,18 @@ async function processOffers(userInput, session){
         result[index + 1] = `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
         return result;
     }, {});
+}
+
+/**
+ *Generated user response based on what the user has provided
+ * @param {string} userInput
+ * @param {object} session
+ * @returns {promise}
+ * **/
+
+async function selectedOffer(userInput, session){
+    const adjustedIndex = userInput - 1;
+    const offer = session.offers[adjustedIndex];
+    return `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
 }
 module.exports = { getSession, setSession, processUSSD };
