@@ -15,7 +15,7 @@ const dataSchema = new mongoose.Schema({
   },
   resource: {
     required: true,
-    type: Number,
+    type: String,
   },
 });
 
