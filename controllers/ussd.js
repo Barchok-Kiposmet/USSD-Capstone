@@ -1,10 +1,11 @@
-
 /**
  *Retrieves a session from the session store based on the session ID
  * @param {Object} sessionStore
  * @param {string} sessionId
  * @returns {Promise<object>}
  * **/
+const {fetchOffersInRange} = require("../model/offers");
+
 function getSession(sessionStore, sessionId) {
     return new Promise((resolve, reject) => {
         sessionStore.get(sessionId, (err, session) => {
