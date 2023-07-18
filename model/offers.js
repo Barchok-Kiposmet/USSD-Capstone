@@ -8,7 +8,7 @@ async function fetchOffersInRange(userAmount) {
         });
         // Map the offers to JSON objects with index+1 as keys and offer names as values
         return  offers.reduce((result, offer, index) => {
-            result[index + 1] = offer.description;
+            result[index + 1] = `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
             return result;
         }, {});
     } catch (err) {
