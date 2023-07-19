@@ -82,23 +82,18 @@ async function validateInput(currentOption, userInput, session) {
 
         case 'availableOffers':
             switch (userInput) {
-                case '0':
+                case '00':
                     return "askAmount";
-                case '98':
-                    return "moreOffers";
             }
-            if(!(userInput >= 0 && userInput < session.offers.length))
+            if(!(userInput >= 0 && userInput <= session.offers.length))
                 return 'invalid'
 
             return "confirmSelectOffer";
 
-        case 'moreOffers':
-            return "confirmSelectOffer";
-
         case 'confirmSelectOffer':
             switch (userInput) {
-                case '0':
-                    return "return";
+                case '00':
+                    return "availableOffers";
                 case '1':
                     return "save";
                 case '2':
@@ -128,19 +123,17 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
             break;
 
         case 'availableOffers':
-            menuText =
-                'CON Available Offers \n';
-            menuOptions = await processOffers(userInput, session);
-            break;
-
-        case 'moreOffers':
-            menuText = 'CON More Offers \n';
-            menuOptions = await getMoreOffers();
+            const amount = (isInvalid || session.menuOption === "confirmSelectOffer") ? session.data.askAmount : userInput;
+            menuOptions = await processOffers(amount, session);
+            menuText = (Object.keys(menuOptions).length === 0)
+                ? `CON NO Offers Available for ${amount}/=`
+                : `CON Available Offers for ${amount}/=`;
+            menuOptions['00']="Back";
             break;
 
         case 'confirmSelectOffer':
             menuText = `END You are about to subscribed to ${await selectedOffer(userInput, session)}. Confirm?`;
-            menuOptions = { '1': 'Yes', '2': 'No', '0': 'Back' };
+            menuOptions = { '1': 'Yes', '2': 'No', '00': 'Back' };
             break;
 
         case 'save':
