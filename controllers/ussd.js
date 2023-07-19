@@ -145,7 +145,7 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
             break;
 
         default:
-            menuText = 'END Invalid input. Please try again.';
+            menuText = 'END Error processing request. Please try again.';
             break;
     }
 
@@ -190,7 +190,7 @@ async function selectedOffer(userInput, session){
     const adjustedIndex = userInput - 1;
     const offer = session.offers[adjustedIndex];
     session.selectedOffer={
-        id:offer.id,
+        id:offer._id,
         name:`${offer.resource} ${offer.description} @ Ksh ${offer.amount}`
     };
     return `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
