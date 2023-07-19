@@ -82,23 +82,18 @@ async function validateInput(currentOption, userInput, session) {
 
         case 'availableOffers':
             switch (userInput) {
-                case '0':
+                case '00':
                     return "askAmount";
-                case '98':
-                    return "moreOffers";
             }
-            if(!(userInput >= 0 && userInput < session.offers.length))
+            if(!(userInput >= 0 && userInput <= session.offers.length))
                 return 'invalid'
 
             return "confirmSelectOffer";
 
-        case 'moreOffers':
-            return "confirmSelectOffer";
-
         case 'confirmSelectOffer':
             switch (userInput) {
-                case '0':
-                    return "return";
+                case '00':
+                    return "availableOffers";
                 case '1':
                     return "save";
                 case '2':
@@ -119,28 +114,27 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
     // Initialize the response variables
     let menuText;
     let menuOptions = {};
+    const invalidChoice = isInvalid?`Invalid choice. Try again.\n`:``;
 
     // Generate the appropriate menu based on the current menu option
     switch (menuOption) {
         case 'askAmount':
-            menuText = 'CON How much do you wish to spend?';
+            menuText = `CON ${invalidChoice} How much do you wish to spend?`;
             menuOptions = {};
             break;
 
         case 'availableOffers':
-            menuText =
-                'CON Available Offers \n';
-            menuOptions = await processOffers(userInput, session);
-            break;
-
-        case 'moreOffers':
-            menuText = 'CON More Offers \n';
-            menuOptions = await getMoreOffers();
+            const amount = (isInvalid || session.menuOption === "confirmSelectOffer") ? session.data.askAmount : userInput;
+            menuOptions = await processOffers(amount, session);
+            menuText = (Object.keys(menuOptions).length === 0)
+                ? `CON ${invalidChoice} NO Offers Available for ${amount}/=`
+                : `CON ${invalidChoice} Available Offers for ${amount}/=`;
+            menuOptions['00']="Back";
             break;
 
         case 'confirmSelectOffer':
-            menuText = `END You are about to subscribed to ${await selectedOffer(userInput, session)}. Confirm?`;
-            menuOptions = { '1': 'Yes', '2': 'No', '0': 'Back' };
+            menuText = `CON You are about to subscribed to ${await selectedOffer(userInput, session)}. Confirm?`;
+            menuOptions = { '1': 'Yes', '2': 'No', '00': 'Back' };
             break;
 
         case 'save':
@@ -152,12 +146,12 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
             break;
 
         default:
-            menuText = 'END Invalid input. Please try again.';
+            menuText = 'END Error processing request. Please try again.';
             break;
     }
 
     // Generate the USSD response
-    let response = isInvalid?"Invalid input, try again\n"+menuText:menuText;
+    let response = menuText;
     const optionKeys = Object.keys(menuOptions);
     if (optionKeys.length > 0) {
         response += '\n' + optionKeys.map((key) => `${key}. ${menuOptions[key]}`).join('\n');
@@ -181,7 +175,7 @@ async function processOffers(userInput, session){
     session.offers = offers;
     // Map the offers to JSON objects with index+1 as keys and offer names as values
     return  offers.reduce((result, offer, index) => {
-        result[index + 1] = `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
+        result[index + 1] = `${offer.resource} ${offer.description} = ${offer.amount}/=`;
         return result;
     }, {});
 }
@@ -197,9 +191,9 @@ async function selectedOffer(userInput, session){
     const adjustedIndex = userInput - 1;
     const offer = session.offers[adjustedIndex];
     session.selectedOffer={
-        id:offer.id,
-        name:`${offer.resource} ${offer.description} @ Ksh ${offer.amount}`
+        id:offer._id,
+        name:`${offer.resource} ${offer.description} = ${offer.amount}/=`
     };
-    return `${offer.resource} ${offer.description} @ Ksh ${offer.amount}`;
+    return `${offer.resource} ${offer.description} = ${offer.amount}/=`;
 }
 module.exports = { getSession, setSession, processUSSD };
