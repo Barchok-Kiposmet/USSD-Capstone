@@ -2,16 +2,20 @@
 
 ## MEET THE TEAM
 
-**[Patrick Barchok](https://github.com/Barchok-Kiposmet)**
-
 **[Vincent Motanya](https://github.com/vinney-mo)**
+
+**[Ruth Mwangi](https://github.com/Ruthmwangi26)**
+
+**[Patrick Barchok](https://github.com/Barchok-Kiposmet)**
 
 **[Pendo Karisa](https://github.com/pkarisa)**
 
 **[Martha Nyagura](https://github.com/marthamwangi09)**
 
 This is an amount filter application on existing products.
+
 This will simplify the long list of products to only a few to the specific amount applied making it easy for the customer to make a choice.
+
 A mock Mongo db database has been created with a few products to demonstrate the filter application.
 
 ## Pre-requisites
