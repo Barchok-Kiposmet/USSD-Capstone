@@ -105,12 +105,15 @@ async function validateInput(currentOption, userInput, session) {
 
         case 'confirmSelectOffer':
             switch (userInput) {
+                case '0':
+                    return "resourceType";
                 case '00':
                     return "availableOffers";
                 case '1':
-                    return "save";
                 case '2':
-                    return "dont_save";
+                    return "save";
+                default:
+                    return "invalid";
             }
     }
 }
@@ -152,12 +155,12 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
             break;
 
         case 'confirmSelectOffer':
-            menuText = `CON You are about to subscribed to ${await selectedOffer(userInput, session)}. Confirm?`;
-            menuOptions = { '1': 'Yes', '2': 'No', '00': 'Back' };
+            menuText = `CON Confirm purchase of ${await selectedOffer(userInput, session)}\n Pay with:`;
+            menuOptions = { '1': 'Airtime', '2': 'M-Pesa', '00': 'Back\n 0. HOME'};
             break;
 
         case 'save':
-            menuText = `END Successful. You have subscribed to ${session.selectedOffer.name}. Thank you!`;
+            menuText = `END Successful. You have subscribed to ${session.selectedOffer.name}\n Thank you!`;
             break;
 
         case 'dont_save':
