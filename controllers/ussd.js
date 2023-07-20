@@ -71,14 +71,27 @@ async function validateInput(currentOption, userInput, session) {
     const regex = /^\d+$/;
     if ( currentOption !== "*" && !regex.test(userInput)) {
         // Invalid input, ask again
-        return 'invalid';
     }
     switch (currentOption) {
         case '*':
-            return "askAmount";
+            return "resourceType";
+
+        case 'resourceType':
+            switch (userInput) {
+                case '1':
+                case '2':
+                    return "askAmount";
+                default:
+                    return "invalid";
+            }
 
         case 'askAmount':
-            return "availableOffers";
+            switch (userInput) {
+                case '00':
+                    return "resourceType";
+                default:
+                    return "availableOffers";
+            }
 
         case 'availableOffers':
             switch (userInput) {
@@ -92,12 +105,15 @@ async function validateInput(currentOption, userInput, session) {
 
         case 'confirmSelectOffer':
             switch (userInput) {
+                case '0':
+                    return "resourceType";
                 case '00':
                     return "availableOffers";
                 case '1':
-                    return "save";
                 case '2':
-                    return "dont_save";
+                    return "save";
+                default:
+                    return "invalid";
             }
     }
 }
@@ -118,27 +134,33 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
 
     // Generate the appropriate menu based on the current menu option
     switch (menuOption) {
+        case 'resourceType':
+            menuText = `CON ${invalidChoice} Options`;
+            menuOptions = {'1': 'Data', '2': 'Talk Time'};
+            break;
+
         case 'askAmount':
             menuText = `CON ${invalidChoice} How much do you wish to spend?`;
-            menuOptions = {};
+            menuOptions = {'OO': 'Back'};
             break;
 
         case 'availableOffers':
             const amount = (isInvalid || session.menuOption === "confirmSelectOffer") ? session.data.askAmount : userInput;
+            const resourceType = (session.data.resourceType === "1") ? "Data" : "Talk Time";
             menuOptions = await processOffers(amount, session);
             menuText = (Object.keys(menuOptions).length === 0)
-                ? `CON ${invalidChoice} NO Offers Available for ${amount}/=`
-                : `CON ${invalidChoice} Available Offers for ${amount}/=`;
+                ? `CON ${invalidChoice} NO ${resourceType} Offers Available for ${amount}/=`
+                : `CON ${invalidChoice} Available ${resourceType} Offers for ${amount}/=`;
             menuOptions['00']="Back";
             break;
 
         case 'confirmSelectOffer':
-            menuText = `CON You are about to subscribed to ${await selectedOffer(userInput, session)}. Confirm?`;
-            menuOptions = { '1': 'Yes', '2': 'No', '00': 'Back' };
+            menuText = `CON Confirm purchase of ${await selectedOffer(userInput, session)}\n Pay with:`;
+            menuOptions = { '1': 'Airtime', '2': 'M-Pesa', '00': 'Back\n 0. HOME'};
             break;
 
         case 'save':
-            menuText = `END Successful. You have subscribed to ${session.selectedOffer.name}. Thank you!`;
+            menuText = `END Successful. You have subscribed to ${session.selectedOffer.name}\n Thank you!`;
             break;
 
         case 'dont_save':
@@ -171,7 +193,7 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
  * **/
 
 async function processOffers(userInput, session){
-    const offers = await fetchOffersInRange(userInput);
+    const offers = await fetchOffersInRange(userInput, session.data.resourceType);
     session.offers = offers;
     // Map the offers to JSON objects with index+1 as keys and offer names as values
     return  offers.reduce((result, offer, index) => {

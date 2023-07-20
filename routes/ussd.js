@@ -36,7 +36,7 @@ router.post('/', async (req, res) => {
     const sessionObj = {
         cookie: {
             maxAge: 60000, httpOnly: true
-        }, id: sessionId, input: text, menuOption: "askAmount", data: {
+        }, id: sessionId, input: text, menuOption: "resourceType", data: {
             phoneNumber: phoneNumber
         }
     }
