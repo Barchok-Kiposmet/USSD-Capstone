@@ -2,11 +2,13 @@
 
 PARTICIPANTS.
 
-1. Patrick Barchok
-2. Vincent Motanya
-3. Ruth Mwangi
-4. Martha Mwangi
-5. Pendo Karisa
+**[Patrick Barchok](https://github.com/Barchok-Kiposmet)**
+
+**[Martha Nyagura](https://github.com/marthamwangi09)**
+
+**[Vincent Motanya](https://github.com/vinney-mo)**
+
+**[Pendo Karisa](https://github.com/pkarisa)**
 
 This is an amount filter application on existing products.
 This will simplify the long list of products to only a few to the specific amount applied making it easy for the customer to make a choice.
