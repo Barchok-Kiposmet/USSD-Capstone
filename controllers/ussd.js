@@ -71,14 +71,27 @@ async function validateInput(currentOption, userInput, session) {
     const regex = /^\d+$/;
     if ( currentOption !== "*" && !regex.test(userInput)) {
         // Invalid input, ask again
-        return 'invalid';
     }
     switch (currentOption) {
         case '*':
-            return "askAmount";
+            return "resourceType";
+
+        case 'resourceType':
+            switch (userInput) {
+                case '1':
+                case '2':
+                    return "askAmount";
+                default:
+                    return "invalid";
+            }
 
         case 'askAmount':
-            return "availableOffers";
+            switch (userInput) {
+                case '00':
+                    return "resourceType";
+                default:
+                    return "availableOffers";
+            }
 
         case 'availableOffers':
             switch (userInput) {
@@ -118,9 +131,14 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
 
     // Generate the appropriate menu based on the current menu option
     switch (menuOption) {
+        case 'resourceType':
+            menuText = `CON ${invalidChoice} Options`;
+            menuOptions = {'1': 'Data', '2': 'Talk Time'};
+            break;
+
         case 'askAmount':
             menuText = `CON ${invalidChoice} How much do you wish to spend?`;
-            menuOptions = {};
+            menuOptions = {'OO': 'Back'};
             break;
 
         case 'availableOffers':
