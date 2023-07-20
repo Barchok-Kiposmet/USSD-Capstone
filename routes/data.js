@@ -8,6 +8,7 @@ router.post('/', async (req, res) => {
   try {
     const data = new dataModel({
       title: req.body.title,
+      type: req.body.type,
       description: req.body.description,
       amount: req.body.amount,
       resource: req.body.resource,
