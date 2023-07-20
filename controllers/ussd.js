@@ -143,10 +143,11 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
 
         case 'availableOffers':
             const amount = (isInvalid || session.menuOption === "confirmSelectOffer") ? session.data.askAmount : userInput;
+            const resourceType = (session.data.resourceType === "1") ? "Data" : "Talk Time";
             menuOptions = await processOffers(amount, session);
             menuText = (Object.keys(menuOptions).length === 0)
-                ? `CON ${invalidChoice} NO Offers Available for ${amount}/=`
-                : `CON ${invalidChoice} Available Offers for ${amount}/=`;
+                ? `CON ${invalidChoice} NO ${resourceType} Offers Available for ${amount}/=`
+                : `CON ${invalidChoice} Available ${resourceType} Offers for ${amount}/=`;
             menuOptions['00']="Back";
             break;
 
@@ -189,7 +190,7 @@ async function generateMenuResponse(menuOption, isInvalid, userInput, session) {
  * **/
 
 async function processOffers(userInput, session){
-    const offers = await fetchOffersInRange(userInput);
+    const offers = await fetchOffersInRange(userInput, session.data.resourceType);
     session.offers = offers;
     // Map the offers to JSON objects with index+1 as keys and offer names as values
     return  offers.reduce((result, offer, index) => {
