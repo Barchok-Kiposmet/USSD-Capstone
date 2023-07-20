@@ -1,6 +1,6 @@
 # USSD Capstone Project
 
-## MEET THE TEAM.
+## MEET THE TEAM
 
 **[Patrick Barchok](https://github.com/Barchok-Kiposmet)**
 
